@@ -56,7 +56,14 @@ The server is configured using the following environment variables:
 ### 1. Build the Container
 Run this command from the root of this project:
 ```bash
+# Standard Build
 docker build -t mstr-mcp-server:latest .
+
+# Proxy-aware Build (Required for internal bank deployments)
+docker build \
+  --build-arg http_proxy="http://proxy.internal-bank.com:8080" \
+  --build-arg https_proxy="http://proxy.internal-bank.com:8080" \
+  -t mstr-mcp-server:latest .
 ```
 
 ### 2. Run the Container
