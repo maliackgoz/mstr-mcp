@@ -69,10 +69,7 @@ if not MSTR_SSL_VERIFY:
     logger.warning("SSL verification is disabled. Do not use this configuration in production.")
 
 # Initialize FastMCP Server
-mcp = FastMCP(
-    name="microstrategy-bi-agent",
-    description="A secure MCP server wrapping MicroStrategy REST API to list and execute reports using user LDAP context."
-)
+mcp = FastMCP("microstrategy-bi-agent")
 
 # =====================================================================
 # Authentication & Extraction Logic
