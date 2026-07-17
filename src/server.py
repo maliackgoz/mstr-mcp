@@ -4,6 +4,10 @@ import logging
 from logging.handlers import RotatingFileHandler
 from typing import Optional, Dict, Any, List
 import pandas as pd
+from dotenv import load_dotenv
+
+# Load environment variables from .env file if it exists (for local testing/dev)
+load_dotenv()
 
 from fastmcp import FastMCP
 from fastmcp.server.dependencies import get_http_headers

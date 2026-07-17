@@ -2,6 +2,10 @@ import os
 import sys
 import unittest
 import logging
+from dotenv import load_dotenv
+
+# Load environment variables from local .env
+load_dotenv()
 
 # Ensure src/ is in the Python path for import compatibility
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
