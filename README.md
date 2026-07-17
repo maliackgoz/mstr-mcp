@@ -29,9 +29,9 @@ This server is designed to integrate as an HTTP/SSE tool within **Onyx**, allowi
 ## Deliverables & Project Structure
 
 *   `src/server.py`: Custom FastMCP server code with dynamic header parsing, pandas parsing, and rotating compliance logs.
-*   `requirements.txt`: Python package requirements (`fastmcp`, `mstrio-py`, `pandas`, `tabulate`, `requests`, `urllib3`).
+*   `requirements.txt`: Python package requirements.
 *   `Dockerfile`: Secure, non-root, lightweight `slim-python` container definition.
-*   `onyx_system_prompt.txt`: Strict system instructions for the local LLM (forbids hallucinations, outlines tool calling pipeline).
+*   `onyx_system_prompt.txt`: Strict system instructions for the local LLM.
 
 ---
 
@@ -60,13 +60,13 @@ Run this command from the root of this project:
 docker build -t mstr-mcp-server:latest .
 
 # Proxy-aware Build (Required for internal bank deployments)
-docker build --build-arg http_proxy="http://proxy.internal-bank.com:8080" --build-arg https_proxy="http://proxy.internal-bank.com:8080" -t mstr-mcp-server:latest .
+docker build --build-arg http_proxy="http://proxy.yourcompany.com:8080" --build-arg https_proxy="http://proxy.yourcompany.com:8080" -t mstr-mcp-server:latest .
 ```
 
 ### 2. Run the Container
 Launch the container, mounting the log folder to your host's secure audit path:
 ```bash
-docker run -d --name mstr-mcp-agent -p 8000:8000 -e MSTR_BASE_URL="https://mstr-library.internal-bank.com/MicroStrategyLibrary/api" -e MSTR_SSL_VERIFY="True" -v /var/log/mcp-audit:/app/logs mstr-mcp-server:latest
+docker run -d --name mstr-mcp-agent -p 8000:8000 -e MSTR_BASE_URL="https://mstr-library.yourcompany.com/MicroStrategyLibrary/api" -e MSTR_SSL_VERIFY="True" -v /var/log/mcp-audit:/app/logs mstr-mcp-server:latest
 ```
 
 ### 3. Register in Onyx Admin UI
@@ -122,7 +122,7 @@ To run the server in STDIO mode for testing (using local environment fallbacks):
 ```bash
 export MSTR_USERNAME="test_ldap_user"
 export MSTR_PASSWORD="test_ldap_password"
-export MSTR_BASE_URL="https://mstr-library.internal-bank.com/MicroStrategyLibrary/api"
+export MSTR_BASE_URL="https://mstr-library.yourcompany.com/MicroStrategyLibrary/api"
 export MSTR_PROJECT_ID="YOUR_PROJECT_ID"
 export MSTR_SSL_VERIFY="False" # For local testing
 
