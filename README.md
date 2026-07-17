@@ -128,3 +128,16 @@ export MSTR_SSL_VERIFY="False" # For local testing
 
 python src/server.py --transport stdio
 ```
+
+### Running Tests inside the Docker Container
+
+If the server is running in a Docker container, you can execute the integration tests or the manual "Send Now" test script inside the container using `docker exec`:
+
+```bash
+# Run the integration tests
+docker exec -it mstr-mcp-agent python -m unittest test/test_integration.py
+
+# Run the manual "Send Now" test script
+docker exec -it mstr-mcp-agent python test/manual_test_send_now.py
+```
+

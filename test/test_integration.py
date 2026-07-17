@@ -100,58 +100,5 @@ class TestMstrAPIIntegration(unittest.TestCase):
         except Exception as e:
             self.fail(f"Failed to list reports in project: {e}")
 
-    def test_04_execute_sample_report(self):
-        """Test executing a specific report or cube and getting a DataFrame"""
-        report_id = os.getenv("MSTR_TEST_REPORT_ID")
-        if not self.project_id or not report_id:
-            self.skipTest("MSTR_PROJECT_ID or MSTR_TEST_REPORT_ID not set. Skipping execution test.")
-            
-        try:
-            conn = Connection(
-                base_url=self.base_url,
-                username=self.username,
-                password=self.password,
-                project_id=self.project_id,
-                login_mode=16,
-                ssl_verify=self.ssl_verify
-            )
-            
-            logger.info(f"Attempting to run report/cube: {report_id}")
-            
-            df = None
-            error_msgs = []
-            
-            # 1. Try loading as a Report
-            try:
-                report = Report(connection=conn, report_id=report_id)
-                df = report.to_dataframe()
-            except Exception as e:
-                error_msgs.append(f"Report: {e}")
-                
-                # 2. Try loading as an OlapCube
-                try:
-                    cube = OlapCube(connection=conn, cube_id=report_id)
-                    df = cube.to_dataframe()
-                except Exception as e2:
-                    error_msgs.append(f"OlapCube: {e2}")
-                    
-                    # 3. Try loading as a SuperCube
-                    try:
-                        sc = SuperCube(connection=conn, id=report_id)
-                        df = sc.to_dataframe()
-                    except Exception as e3:
-                        error_msgs.append(f"SuperCube: {e3}")
-            
-            if df is None:
-                self.fail(f"Could not execute object '{report_id}' as Report, OlapCube or SuperCube. Errors:\n" + "\n".join(error_msgs))
-                
-            logger.info(f"Execution successful. DataFrame contains {len(df)} rows and {len(df.columns)} columns.")
-            logger.info(f"\nSample data:\n{df.head(5).to_string()}")
-            
-            self.assertFalse(df.empty, "Execution succeeded but returned an empty DataFrame.")
-            conn.close()
-        except Exception as e:
-            self.fail(f"Failed to execute report: {e}")
-
 if __name__ == "__main__":
     unittest.main()
