@@ -1,8 +1,8 @@
 # MicroStrategy (MSTR) BI Agent MCP Server
 
-Phase 1 of the Enterprise AI Architecture at our highly regulated state bank: a secure Model Context Protocol (MCP) server that wraps the MicroStrategy REST API, enforcing native Row-Level Security (RLS) and object-level permissions using **Pass-Through LDAP Authentication**.
+A secure Model Context Protocol (MCP) server that wraps the MicroStrategy REST API, enforcing native Row-Level Security (RLS) and object-level permissions using **Pass-Through LDAP Authentication**.
 
-This server is designed to integrate as an HTTP/SSE tool within **Onyx** (formerly Danswer), allowing our local **Qwen 27B** LLM to execute reports and return data to authorized bank employees without using master API keys.
+This server is designed to integrate as an HTTP/SSE tool within **Onyx**, allowing a local LLM to execute reports and return data to authorized users without using master API keys.
 
 ---
 
@@ -31,7 +31,7 @@ This server is designed to integrate as an HTTP/SSE tool within **Onyx** (former
 *   `src/server.py`: Custom FastMCP server code with dynamic header parsing, pandas parsing, and rotating compliance logs.
 *   `requirements.txt`: Python package requirements (`fastmcp`, `mstrio-py`, `pandas`, `tabulate`, `requests`, `urllib3`).
 *   `Dockerfile`: Secure, non-root, lightweight `slim-python` container definition.
-*   `onyx_system_prompt.txt`: Strict system instructions for Qwen 27B (forbids hallucinations, outlines tool calling pipeline).
+*   `onyx_system_prompt.txt`: Strict system instructions for the local LLM (forbids hallucinations, outlines tool calling pipeline).
 
 ---
 
@@ -60,22 +60,13 @@ Run this command from the root of this project:
 docker build -t mstr-mcp-server:latest .
 
 # Proxy-aware Build (Required for internal bank deployments)
-docker build \
-  --build-arg http_proxy="http://proxy.internal-bank.com:8080" \
-  --build-arg https_proxy="http://proxy.internal-bank.com:8080" \
-  -t mstr-mcp-server:latest .
+docker build --build-arg http_proxy="http://proxy.internal-bank.com:8080" --build-arg https_proxy="http://proxy.internal-bank.com:8080" -t mstr-mcp-server:latest .
 ```
 
 ### 2. Run the Container
 Launch the container, mounting the log folder to your host's secure audit path:
 ```bash
-docker run -d \
-  --name mstr-mcp-agent \
-  -p 8000:8000 \
-  -e MSTR_BASE_URL="https://mstr-library.internal-bank.com/MicroStrategyLibrary/api" \
-  -e MSTR_SSL_VERIFY="True" \
-  -v /var/log/mcp-audit:/app/logs \
-  mstr-mcp-server:latest
+docker run -d --name mstr-mcp-agent -p 8000:8000 -e MSTR_BASE_URL="https://mstr-library.internal-bank.com/MicroStrategyLibrary/api" -e MSTR_SSL_VERIFY="True" -v /var/log/mcp-audit:/app/logs mstr-mcp-server:latest
 ```
 
 ### 3. Register in Onyx Admin UI

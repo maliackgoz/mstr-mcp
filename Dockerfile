@@ -34,7 +34,10 @@ RUN pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted
     pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org --no-cache-dir -r /app/requirements.txt
 
 # Copy server implementation
-COPY src/server.py /app/server.py
+COPY src/ /app/src/
+
+# Copy test files
+COPY test/ /app/test/
 
 # Set proper ownership
 RUN chown -R mcpuser:mcpuser /app
@@ -47,7 +50,7 @@ USER mcpuser
 
 # Add a basic healthcheck to verify the server is running
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:8000/sse || exit 1
+    CMD curl -f http://localhost:8000/sse || exit 1
 
 # Execute server
-CMD ["python", "server.py"]
+CMD ["python", "src/server.py"]
