@@ -59,15 +59,25 @@ Run this command from the root of this project:
 # Standard Build
 docker build -t mstr-mcp-server:latest .
 
-# Proxy-aware Build (Required for internal bank deployments)
+# Proxy-aware Build
 docker build --build-arg http_proxy="http://proxy.yourcompany.com:8080" --build-arg https_proxy="http://proxy.yourcompany.com:8080" -t mstr-mcp-server:latest .
 ```
 
 ### 2. Run the Container
-Launch the container, mounting the log folder to your host's secure audit path:
+Launch the container, mounting the log folder to your host's secure audit path. 
+
+You can pass configuration variables either directly via `-e` flags or by referencing your local `.env` file using the `--env-file` flag:
+
+**Option A: Using a local `.env` file (Recommended)**
+```bash
+docker run -d --name mstr-mcp-agent -p 8000:8000 --env-file .env -v /var/log/mcp-audit:/app/logs mstr-mcp-server:latest
+```
+
+**Option B: Specifying variables directly**
 ```bash
 docker run -d --name mstr-mcp-agent -p 8000:8000 -e MSTR_BASE_URL="https://mstr-library.yourcompany.com/MicroStrategyLibrary/api" -e MSTR_SSL_VERIFY="True" -v /var/log/mcp-audit:/app/logs mstr-mcp-server:latest
 ```
+
 
 ### 3. Register in Onyx Admin UI
 *   Go to **Onyx Admin UI** -> **Tools** -> **Add Custom Tool**.

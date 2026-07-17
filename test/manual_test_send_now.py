@@ -220,8 +220,14 @@ def main():
         # =====================================================================
         logger.info(f"Step 4: Executing document '{DOCUMENT_ID}' to create an instance...")
         instance_url = f"{MSTR_BASE_URL}/documents/{DOCUMENT_ID}/instances"
-        res = session.post(instance_url, json={}, verify=MSTR_SSL_VERIFY, timeout=30)
-        res.raise_for_status()
+        try:
+            res = session.post(instance_url, json={}, verify=MSTR_SSL_VERIFY, timeout=30)
+            res.raise_for_status()
+        except Exception as e:
+            logger.error(f"Failed to create document instance: {e}")
+            if 'res' in locals() and res.text:
+                logger.error(f"Response Body: {res.text}")
+            raise e
         
         instance_details = res.json()
         instance_id = instance_details.get("mid")
@@ -242,12 +248,18 @@ def main():
                 prompt_payload = {
                     "prompts": PROMPT_ANSWERS
                 }
-                res = session.put(prompt_answers_url, json=prompt_payload, verify=MSTR_SSL_VERIFY, timeout=20)
-                if res.status_code == 204:
-                    logger.info("Prompt answers applied successfully (HTTP 204).")
-                else:
-                    res.raise_for_status()
-                    logger.info(f"Prompt answers applied. Status Code: {res.status_code}")
+                try:
+                    res = session.put(prompt_answers_url, json=prompt_payload, verify=MSTR_SSL_VERIFY, timeout=20)
+                    if res.status_code == 204:
+                        logger.info("Prompt answers applied successfully (HTTP 204).")
+                    else:
+                        res.raise_for_status()
+                        logger.info(f"Prompt answers applied. Status Code: {res.status_code}")
+                except Exception as e:
+                    logger.error(f"Failed to answer prompts: {e}")
+                    if 'res' in locals() and res.text:
+                        logger.error(f"Response Body: {res.text}")
+                    raise e
         else:
             logger.info("Step 5: Skipping prompt answering (document is not prompted).")
 
@@ -290,8 +302,14 @@ def main():
             }
         }
 
-        res = session.post(subscriptions_url, json=subscription_payload, verify=MSTR_SSL_VERIFY, timeout=30)
-        res.raise_for_status()
+        try:
+            res = session.post(subscriptions_url, json=subscription_payload, verify=MSTR_SSL_VERIFY, timeout=30)
+            res.raise_for_status()
+        except Exception as e:
+            logger.error(f"Failed to create subscription / trigger send now: {e}")
+            if 'res' in locals() and res.text:
+                logger.error(f"Response Body: {res.text}")
+            raise e
         
         subscription_res = res.json()
         subscription_id = subscription_res.get("id")
